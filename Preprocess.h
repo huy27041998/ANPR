@@ -6,7 +6,8 @@ class Preprocess
 {
 public:
 	static Mat convertToGray(Mat srcImg);
-	static Mat thresholdImage(Mat grayImg);
+	static Mat thresholdImage(Mat grayImg, int blockSize, double C);
+	static Mat gBlur(Mat grayImg);
 	Preprocess();
 	virtual ~Preprocess();
 };
