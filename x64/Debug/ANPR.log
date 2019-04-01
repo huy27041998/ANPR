@@ -1,1 +1,9 @@
-﻿  ANPR.vcxproj -> D:\Document\C++\ANPR\ANPR\.\OutputDir\ANPR.exe
+﻿  DetectPlate.cpp
+d:\document\c++\anpr\anpr\detectplate.cpp(13): warning C4244: 'return': conversion from 'float' to 'int', possible loss of data
+d:\document\c++\anpr\anpr\detectplate.cpp(18): warning C4244: 'return': conversion from 'float' to 'int', possible loss of data
+d:\document\c++\anpr\anpr\detectplate.cpp(41): warning C4244: 'initializing': conversion from '_Tp' to 'float', possible loss of data
+          with
+          [
+              _Tp=int
+          ]
+  ANPR.vcxproj -> D:\Document\C++\ANPR\ANPR\.\OutputDir\ANPR.exe

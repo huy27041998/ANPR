@@ -1,3 +1,6 @@
+#include <vector>
+#include <iostream>
+#include <opencv2/highgui/highgui.hpp>
 std::vector<PossiblePlate> detectPlatesInScene(cv::Mat &imgOriginalScene) {
     std::vector<PossiblePlate> vectorOfPossiblePlates;			// this will be the return value
 
@@ -143,4 +146,18 @@ PossiblePlate extractPlate(cv::Mat &imgOriginal, std::vector<PossibleChar> &vect
     possiblePlate.imgPlate = imgCropped;            // copy the cropped plate image into the applicable member variable of the possible plate
 
     return(possiblePlate);
+}
+
+
+bool checkIfPossibleChar(PossibleChar &possibleChar) {
+    // this function is a 'first pass' that does a rough check on a contour to see if it could be a char,
+    // note that we are not (yet) comparing the char to other chars to look for a group
+    if (possibleChar.boundingRect.area() > MIN_PIXEL_AREA &&
+        possibleChar.boundingRect.width > MIN_PIXEL_WIDTH && possibleChar.boundingRect.height > MIN_PIXEL_HEIGHT &&
+        MIN_ASPECT_RATIO < possibleChar.dblAspectRatio && possibleChar.dblAspectRatio < MAX_ASPECT_RATIO) {
+        return(true);
+    }
+    else {
+        return(false);
+    }
 }
