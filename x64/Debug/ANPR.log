@@ -1,9 +1,11 @@
-﻿  DetectPlate.cpp
-d:\document\c++\anpr\anpr\detectplate.cpp(13): warning C4244: 'return': conversion from 'float' to 'int', possible loss of data
-d:\document\c++\anpr\anpr\detectplate.cpp(18): warning C4244: 'return': conversion from 'float' to 'int', possible loss of data
-d:\document\c++\anpr\anpr\detectplate.cpp(41): warning C4244: 'initializing': conversion from '_Tp' to 'float', possible loss of data
+﻿  DetectPlate1.cpp
+d:\document\c++\anpr\anpr\detectplate1.cpp(72): warning C4305: 'initializing': truncation from 'double' to 'float'
+d:\document\c++\anpr\anpr\detectplate1.cpp(73): warning C4305: 'initializing': truncation from 'double' to 'float'
+d:\document\c++\anpr\anpr\detectplate1.cpp(74): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+d:\document\c++\anpr\anpr\detectplate1.cpp(75): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+d:\document\c++\anpr\anpr\detectplate1.cpp(78): warning C4244: 'initializing': conversion from '_Tp' to 'int', possible loss of data
           with
           [
-              _Tp=int
+              _Tp=float
           ]
   ANPR.vcxproj -> D:\Document\C++\ANPR\ANPR\.\OutputDir\ANPR.exe

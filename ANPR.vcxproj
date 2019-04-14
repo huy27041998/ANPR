@@ -125,6 +125,7 @@
   <ItemGroup>
     <ClCompile Include="DetectChar.cpp" />
     <ClCompile Include="DetectPlate.cpp" />
+    <ClCompile Include="DetectPlate1.cpp" />
     <ClCompile Include="GenData.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Preprocess.cpp" />
@@ -132,6 +133,7 @@
   <ItemGroup>
     <ClInclude Include="DetectChar.h" />
     <ClInclude Include="DetectPlate.h" />
+    <ClInclude Include="DetectPlate1.h" />
     <ClInclude Include="GenData.h" />
     <ClInclude Include="Preprocess.h" />
   </ItemGroup>

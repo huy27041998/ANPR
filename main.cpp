@@ -5,6 +5,7 @@
 #include "DetectChar.h"
 #include "GenData.h"
 #include "DetectPlate.h"
+#include "DetectPlate1.h"
 using namespace std;
 using namespace cv;
 
@@ -18,9 +19,13 @@ int main()
 		cin.get();
 		return 0;
 	}
-	resize(sourceImg, sourceImg, Size(sourceImg.cols / 2, sourceImg.rows / 2)); //làm nhỏ ảnh để tăng tốc độ xử lý
-	DetectPlate dp;
+	//resize(sourceImg, sourceImg, Size(sourceImg.cols / 2, sourceImg.rows / 2)); //làm nhỏ ảnh để tăng tốc độ xử lý
+	DetectPlate1 dp;
 	vector<Mat> plate = dp.findPlate(sourceImg);
+	int i = 0;
+	for (auto p : plate) {
+		imshow(to_string(i), p);
+	}
 	//Mat p = plate[0];
 	//imshow("plate", p);
 	/*DetectChar dt;

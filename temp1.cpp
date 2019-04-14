@@ -148,16 +148,35 @@ PossiblePlate extractPlate(cv::Mat &imgOriginal, std::vector<PossibleChar> &vect
     return(possiblePlate);
 }
 
+std::vector<PossibleChar> findVectorOfMatchingChars(const PossibleChar &possibleChar, const std::vector<PossibleChar> &vectorOfChars) {
+    // the purpose of this function is, given a possible char and a big vector of possible chars,
+    // find all chars in the big vector that are a match for the single possible char, and return those matching chars as a vector
+    std::vector<PossibleChar> vectorOfMatchingChars;                // this will be the return value
 
-bool checkIfPossibleChar(PossibleChar &possibleChar) {
-    // this function is a 'first pass' that does a rough check on a contour to see if it could be a char,
-    // note that we are not (yet) comparing the char to other chars to look for a group
-    if (possibleChar.boundingRect.area() > MIN_PIXEL_AREA &&
-        possibleChar.boundingRect.width > MIN_PIXEL_WIDTH && possibleChar.boundingRect.height > MIN_PIXEL_HEIGHT &&
-        MIN_ASPECT_RATIO < possibleChar.dblAspectRatio && possibleChar.dblAspectRatio < MAX_ASPECT_RATIO) {
-        return(true);
+    for (auto &possibleMatchingChar : vectorOfChars) {              // for each char in big vector
+
+                                                                    // if the char we attempting to find matches for is the exact same char as the char in the big vector we are currently checking
+        if (possibleMatchingChar == possibleChar) {
+            // then we should not include it in the vector of matches b/c that would end up double including the current char
+            continue;           // so do not add to vector of matches and jump back to top of for loop
+        }
+        // compute stuff to see if chars are a match
+        double dblDistanceBetweenChars = distanceBetweenChars(possibleChar, possibleMatchingChar);
+        double dblAngleBetweenChars = angleBetweenChars(possibleChar, possibleMatchingChar);
+        double dblChangeInArea = (double)abs(possibleMatchingChar.boundingRect.area() - possibleChar.boundingRect.area()) / (double)possibleChar.boundingRect.area();
+        double dblChangeInWidth = (double)abs(possibleMatchingChar.boundingRect.width - possibleChar.boundingRect.width) / (double)possibleChar.boundingRect.width;
+        double dblChangeInHeight = (double)abs(possibleMatchingChar.boundingRect.height - possibleChar.boundingRect.height) / (double)possibleChar.boundingRect.height;
+
+        // check if chars match
+        if (dblDistanceBetweenChars < (possibleChar.dblDiagonalSize * MAX_DIAG_SIZE_MULTIPLE_AWAY) &&
+            dblAngleBetweenChars < MAX_ANGLE_BETWEEN_CHARS &&
+            dblChangeInArea < MAX_CHANGE_IN_AREA &&
+            dblChangeInWidth < MAX_CHANGE_IN_WIDTH &&
+            dblChangeInHeight < MAX_CHANGE_IN_HEIGHT) {
+            vectorOfMatchingChars.push_back(possibleMatchingChar);      // if the chars are a match, add the current char to vector of matching chars
+        }
     }
-    else {
-        return(false);
-    }
+
+    return(vectorOfMatchingChars);          // return result
 }
+
