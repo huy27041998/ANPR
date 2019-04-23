@@ -1,6 +1,14 @@
 #include "GenData.h"
 
+bool GenData::sortRectX(const Rect &r1, const Rect &r2)
+{
+	return (r1.x < r2.x && abs(r1.y - r2.y) < 10);
+}
 
+bool GenData::sortRectY(const Rect &r1, const Rect &r2)
+{
+	return (r1.y < r2.y );
+}
 
 void GenData::GenData1(const char * path, int startNumber)
 {
@@ -96,42 +104,39 @@ void GenData::GenData1(const char * path, int startNumber)
 GenData::GenData(const char* path, int startNumber)
 {
 	Mat sourceImg = imread(path, IMREAD_UNCHANGED);
-	Mat thresholdImg = Preprocess::thresholdImage(Preprocess::convertToGray(sourceImg), 19, 9);
+	Mat thresholdImg = Preprocess::adaptiveThreshold(Preprocess::convertToGray(sourceImg), 19, 9);
 	//cout << w << " " << h << endl;
+	//Mat thresholdImg = Preprocess::convertToGray(sourceImg);  (sourceImg, thresholdImg, 127, 255, THRESH_BINARY_INV);
 	vector<Mat> character;
 	vector<vector<Point>> contours;
 	Mat temp1 = sourceImg.clone();
 	//Tìm viền
-	findContours(thresholdImg, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+	findContours(thresholdImg, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
 	//Vẽ viền
 	/*for (int i = 0; i < contours.size(); i++) 
 		drawContours(temp1, contours, i, Scalar(0,0,255), 1, 8, noArray(), INT_MAX, Point(0, 0));	*/
 	vector <Rect> R; //Lưu tọa độ của bao viền
 	for (int i = 0; i < contours.size(); i++) {
 		Rect r = boundingRect(contours[i]);
-		if (28 < r.height && r.width > 16) {
-			//cout << r.width << " " << r.height << endl;
-			rectangle(temp1, r, Scalar(255, 0, 0), 1, 8, 0);
-			R.push_back(r);
-		}
+		rectangle(temp1, r, Scalar(0, 0, 255), 1, 8, 0);
+		R.push_back(r);
 	}
-	imshow("gen", temp1);
 	if (R.size() == 0) {
 		cout << "Khong tim thay chu cai." << endl;
 	}
-	//Sắp xếp 
-	//Xếp theo hàng dọc
-	for (int i = 0; i < R.size() - 1; i++)
+	
+	for (int i = 0; i < R.size(); i++) {
 		for (int j = i + 1; j < R.size(); j++) {
-			if (R[i].y > R[j].y)
+			if (abs(R[i].y - R[j].y) > 2)
 				swap(R[i], R[j]);
 		}
-	//Xếp theo hàng ngang
-	for (int i = 0; i < R.size() - 1; i++)
+	}
+	for (int i = 0; i < R.size(); i++) {
 		for (int j = i + 1; j < R.size(); j++) {
-			if (R[i].x > R[j].x && fabs(R[i].y - R[j].y) < 0.5)
+			if (R[i].x > R[j].x && abs(R[i].y - R[j].y) < 2)
 				swap(R[i], R[j]);
 		}
+	}
 	for (int i = 0; i < R.size(); i++) {
 		Mat temp(sourceImg, R[i]);
 		cout << to_string(i + startNumber) + ".png" << endl;

@@ -12,32 +12,31 @@ using namespace cv;
 
 int main()
 {
-	//GenData g("C:\\Users\\Huy\\Desktop\\training2.png", 72);
-	Mat sourceImg = imread("image1.png", IMREAD_UNCHANGED);
-	if (sourceImg.empty()) {
-		cout << "Cannot open image" << endl;
-		cin.get();
+	Mat srcImg = imread("image1.png", IMREAD_UNCHANGED);
+	if (!srcImg.empty()) {
+		cout << "Cannot find image";
 		return 0;
 	}
-	//resize(sourceImg, sourceImg, Size(sourceImg.cols / 2, sourceImg.rows / 2)); //làm nhỏ ảnh để tăng tốc độ xử lý
-	DetectPlate1 dp;
-	vector<Mat> plate = dp.findPlate(sourceImg);
-	int i = 0;
-	for (auto p : plate) {
-		imshow(to_string(i), p);
+	DetectPlate dp;
+	DetectChar dt;
+	vector<Mat> plate = dp.findPlate(srcImg);
+	if (plate.size() == 0) {
+		cout << "Cannot find plate";
+		return 0;
 	}
-	//Mat p = plate[0];
-	//imshow("plate", p);
-	/*DetectChar dt;
-	dt.train("C:\\Users\\Huy\\Desktop\\Training");
-	Mat grayimg = Preprocess::convertToGray(p).clone();
-	Mat thresholdimg = Preprocess::thresholdImage(grayimg, 19, 9).clone();
-	vector<Mat> character = dt.splitChar(thresholdimg, p);
-	for (int i = 0; i < character.size(); i++) {
-		string s = to_string(i);
-		imshow(s, character[i]);
-		cout << dt.detect(character[i]);
-	}*/
+	for (int i = 0; i < plate.size(); i++) {
+		imshow(to_string(i), plate[i]);
+	}
+	waitKey(0);
+	for (int i = 0; i < plate.size(); i++) {
+		vector<Mat> charImg = dt.splitChar(srcImg);
+		for (int j = 0; j < charImg.size(); j++) {
+			imshow(to_string(j), charImg[j]);
+		}
+		
+	}
+
+
 	waitKey(0);
 	cin.get();
 	return 0;

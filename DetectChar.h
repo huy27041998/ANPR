@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <iostream>
 #include "Preprocess.h"
+#include "DetectPlate.h"
 using namespace std;
 using namespace cv;
 using namespace ml;
@@ -13,14 +14,19 @@ const int MIN_AREA = 80;
 const int MAX_AREA = 100;
 const float MIN_RATIO = 0.5;
 const float MAX_RATIO = 1;
+
 class DetectChar
 {
 public:
-	Ptr<KNearest> knn;
-	void train(string path);
-	void train1();
-	char detect(Mat srcImg);
-	static vector<Mat> splitChar(Mat thresholdImg, Mat sourceImg);
+	static Ptr<KNearest> knn;
+	static SVM svm;
+	void trainKNN(string path);
+	void trainKNNUsingXML();
+	void trainSVM(string path);
+	char detectKNN(Mat srcImg);
+	char detectSVM(Mat srcImg);
+	static bool checkIfPossibleChar(Rect r, Mat thresholdImg);
+	static vector<Mat> splitChar(vector<Mat> plate, Mat sourceImg);
 	DetectChar();
 	~DetectChar();
 };
