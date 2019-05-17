@@ -105,7 +105,7 @@ vector<Mat> DetectPlate::findPlate(Mat srcImg)
 			charContours.push_back(r);
 		}
 	}
-	imshow("display", display);
+	imshow("All Char Contours", display);
 	waitKey(0);
 	//Sắp xếp lại đường viền.
 	sort(charContours.begin(), charContours.end(), sortRectXY);
@@ -123,36 +123,40 @@ vector<Mat> DetectPlate::findPlate(Mat srcImg)
 			Point2d plateCenter = Point2d(plateCenterX, plateCenterY);
 			double plateWidth =  PLATE_WIDTH_PADDING_FACTOR * distanceBetweenRect(group[0], group[size - 1]);
 			double plateHeight = 0;
-			cout << endl << plateCenter << endl;
+			for (int i = 0; i < group.size(); i++) {
+				plateHeight += group[i].height;
+			}
 			plateHeight = plateHeight / size * PLATE_HEIGHT_PADDING_FACTOR;
 			double plateAngle = angleBetweenRect(group[0], group[size - 1]);
 			RotatedRect r = RotatedRect(plateCenter, Size2f((float)plateWidth, (float)plateHeight), (float)plateAngle);
-			//diplay Rotated Rect
-			//{
-			//	cv::Point2f vertices2f[4];
-			//	r.points(vertices2f);
-			//	Point vertices[4];
-			//	for (int i = 0; i < 4; ++i) {
-			//		vertices[i] = vertices2f[i];
-			//	}
-			//	cv::fillConvexPoly(display, vertices, 4, Scalar(0, 0, 255));
-			//	imshow("display", display);
-			//	waitKey(0); 
-			//}
+//			diplay rotated rect
+			{
+				cv::Point2f vertices2f[4];
+				r.points(vertices2f);
+				Point vertices[4];
+				for (int i = 0; i < 4; ++i) {
+					vertices[i] = vertices2f[i];
+				}
+				cv::fillConvexPoly(display, vertices, 4, Scalar(0, 0, 255));
+				imshow("Possible Plate", display);
+				waitKey(0); 
+			}
 			Mat imgCroped;
 			Mat temp = srcImg.clone();
 			Mat rotationMatrix = getRotationMatrix2D(plateCenter, plateAngle, 1.0) * 180 / CV_PI;
 			warpAffine(temp, imgCroped, rotationMatrix, temp.size());
-			imshow("temp", temp);
 			waitKey(0);
 			temp = Preprocess::convertToGray(temp);
 			getRectSubPix(temp, Size2f((float)plateWidth, (float)plateHeight), plateCenter, imgCroped);
-			plate.push_back(imgCroped);
+			if (imgCroped.cols > 120 && imgCroped.cols < 300) {
+				cout << imgCroped.cols << endl;
+				plate.push_back(imgCroped);
+			}
 			temp.~Mat();
 			rotationMatrix.~Mat();
 		}
 	}
-	cout << plate.size() << " found.";
+	cout << "Found " << plate.size() << " Possible Plate" << endl;
 	return plate;
 }
 

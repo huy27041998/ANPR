@@ -13,9 +13,9 @@ const double MAX_CHANGE_IN_AREA = 0.5;
 const double MAX_CHANGE_IN_WIDTH = 0.8;
 const double MAX_CHANGE_IN_HEIGHT = 0.2;
 const double MAX_ANGLE_BETWEEN_CHARS = 12.0;
-const double MAX_DISTANCE_BETWEEN_CHARS = 50;
+const double MAX_DISTANCE_BETWEEN_CHARS = 60;
 const double MAX_CHAR_WIDTH = 60;
-const double MAX_CHAR_AREA = 1000;
+const double MAX_CHAR_AREA = 1500;
 class DetectPlate
 {
 public:

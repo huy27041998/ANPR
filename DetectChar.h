@@ -18,15 +18,15 @@ const float MAX_RATIO = 1;
 class DetectChar
 {
 public:
-	static Ptr<KNearest> knn;
-	static SVM svm;
+	Ptr<KNearest> knn;
+	Ptr<SVM> svm;
 	void trainKNN(string path);
 	void trainKNNUsingXML();
 	void trainSVM(string path);
 	char detectKNN(Mat srcImg);
 	char detectSVM(Mat srcImg);
 	static bool checkIfPossibleChar(Rect r, Mat thresholdImg);
-	static vector<Mat> splitChar(vector<Mat> plate, Mat sourceImg);
+	static vector<Mat> splitChar(Mat plate);
 	DetectChar();
 	~DetectChar();
 };
