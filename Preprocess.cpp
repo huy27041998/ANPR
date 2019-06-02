@@ -12,15 +12,15 @@ Mat Preprocess::convertToGray(Mat srcImg)
 Mat Preprocess::simpleThreshold(Mat srcImg, int threshValue)
 {	
 	Mat thresholdImg;
-	cv::threshold(srcImg, thresholdImg, threshValue, 255, THRESH_BINARY);
+	cv::threshold(srcImg, thresholdImg, threshValue, 255, THRESH_OTSU);
 	return thresholdImg;
 }
 
-Mat Preprocess::adaptiveThreshold(Mat grayImg, int blockSize, double C)
+Mat Preprocess::adaptiveThreshold(Mat grayImg, ThresholdTypes type, int blockSize, double C)
 {
 	Mat thresholdImg;
 	GaussianBlur(grayImg, grayImg, Size(5, 5), 0);
-	cv::adaptiveThreshold(grayImg, thresholdImg, 255.0, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, blockSize, C);
+	cv::adaptiveThreshold(grayImg, thresholdImg, 255.0, ADAPTIVE_THRESH_GAUSSIAN_C, type, blockSize, C);
 	return thresholdImg;
 }
 

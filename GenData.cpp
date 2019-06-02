@@ -104,7 +104,7 @@ void GenData::GenData1(const char * path, int startNumber)
 GenData::GenData(const char* path, int startNumber)
 {
 	Mat sourceImg = imread(path, IMREAD_UNCHANGED);
-	Mat thresholdImg = Preprocess::adaptiveThreshold(Preprocess::convertToGray(sourceImg), 19, 9);
+	Mat thresholdImg = Preprocess::adaptiveThreshold(Preprocess::convertToGray(sourceImg), THRESH_BINARY_INV, 19, 9);
 	//cout << w << " " << h << endl;
 	//Mat thresholdImg = Preprocess::convertToGray(sourceImg);  (sourceImg, thresholdImg, 127, 255, THRESH_BINARY_INV);
 	vector<Mat> character;

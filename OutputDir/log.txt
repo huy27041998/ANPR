@@ -1,0 +1,6 @@
+Tesseract Open Source OCR Engine v4.0.0.20190314 with Leptonica
+Warning: Invalid resolution 0 dpi. Using 70 instead.
+Estimating resolution as 819
+Empty page!!
+Estimating resolution as 819
+Empty page!!

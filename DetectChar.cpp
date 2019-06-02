@@ -6,7 +6,7 @@ bool DetectChar::checkIfPossibleChar(Rect r, Mat thresholdImg) {
 	Mat temp(thresholdImg, r);
 	float ratio = (float)countNonZero(temp) / s;
 	temp.~Mat();
-	return (ratio > 0.3 && ratio < 0.7 && 200 < s && r.width > 10 && r.width < 27 && r.height < 60 &&  s < MAX_CHAR_AREA  && w < MAX_CHAR_WIDTH);
+	return (ratio > 0.3 && ratio < 0.7 && 300 < s && r.width < 27 && r.height > 24 && r.height < 60 &&  s < MAX_CHAR_AREA  && w < MAX_CHAR_WIDTH);
 	//return true;
 }
 
@@ -18,7 +18,9 @@ void DetectChar::trainKNN(string path)
 	for (auto &p : fs::directory_iterator(path)) {
 		for (auto &q : fs::directory_iterator(p)) {
 			Mat temp = imread(q.path().string(), IMREAD_UNCHANGED);
-			temp = Preprocess::convertToGray(temp);
+			if (temp.channels() != 1) {
+				temp = Preprocess::convertToGray(temp);
+			}
 			resize(temp, temp, Size(30, 30));
 			temp.convertTo(temp, CV_32FC1);
 			temp = temp.reshape(1, 1);
@@ -42,18 +44,21 @@ void DetectChar::trainSVM(string path)
 	for (auto &p : fs::directory_iterator(path)) {
 		for (auto &q : fs::directory_iterator(p)) {
 			Mat temp = imread(q.path().string(), IMREAD_UNCHANGED);
-			temp = Preprocess::convertToGray(temp);
+			if (temp.channels() != 1) {
+				temp = Preprocess::convertToGray(temp);
+			}
 			resize(temp, temp, Size(30, 30));
 			temp.convertTo(temp, CV_32FC1);
 			temp = temp.reshape(1, 1);
 			traindata.push_back(temp);
 			classification.push_back(i);
-			
 		}
 		if (i != (int) '9')
 			i++;
 		else
 			i = (int) 'A';
+		if (i == (int)'I')
+			i = (int) 'I';
 	}
 	this->svm = SVM::create();
 	this->svm->setType(SVM::C_SVC);
@@ -62,43 +67,43 @@ void DetectChar::trainSVM(string path)
 	this->svm->train(traindata, ROW_SAMPLE, classification);
 }
 
-void DetectChar::trainKNNUsingXML()
+vector<float> DetectChar::calculate_feature(Mat src)
 {
-	Mat matClassificationInts;
-	FileStorage fsClassifications("classifications.xml", FileStorage::READ);
-
-	if (fsClassifications.isOpened() == false) {
-		std::cout << "error, unable to open training classifications file, exiting program\n\n";
-		return;
+	Mat img;
+	if (src.channels() != 1)
+	{
+		img = Preprocess::convertToGray(src);
+		threshold(img, img, 100, 255, THRESH_BINARY);
+	}
+	else
+	{
+		threshold(src, img, 100, 255, THRESH_BINARY);
 	}
 
-	fsClassifications["classifications"] >> matClassificationInts;
-	fsClassifications.release();
-
-
-	Mat matTrainingImagesAsFlattenedFloats;
-
-	FileStorage fsTrainingImages("images.xml", FileStorage::READ);
-
-	if (fsTrainingImages.isOpened() == false) {
-		std::cout << "error, unable to open training images file, exiting program\n\n";
-		return;
+	vector<float> r;
+	resize(img, img, Size(40, 40));
+	int h = img.rows / 15;
+	int w = img.cols / 15;
+	int S = countNonZero(img);
+	int T = img.cols * img.rows;
+	for (int i = 0; i < img.rows; i += h)
+	{
+		for (int j = 0; j < img.cols; j += w)
+		{
+			Mat cell = img(Rect(i, j, h, w));
+			int s = countNonZero(cell);
+			float f = (float)s / S;
+			r.push_back(f);
+		}
 	}
-
-	fsTrainingImages["images"] >> matTrainingImagesAsFlattenedFloats;
-	fsTrainingImages.release();
-
-
-	this->knn = KNearest::create();
-	this->knn->train(matTrainingImagesAsFlattenedFloats, ml::ROW_SAMPLE, matClassificationInts);
-
+	return r;
 }
-
 
 char DetectChar::detectKNN(Mat srcImg)
 {
 	Mat temp = srcImg.clone();
-	//temp = Preprocess::convertToGray(temp);
+	if (srcImg.channels() != 1)
+		temp = Preprocess::convertToGray(temp);
 	resize(temp, temp, Size(30, 30));
 	temp.convertTo(temp, CV_32F);
 	Mat detect(30, 30, CV_32F);
@@ -111,17 +116,25 @@ char DetectChar::detectKNN(Mat srcImg)
 char DetectChar::detectSVM(Mat srcImg)
 {
 	Mat temp = srcImg.clone();
+	if (srcImg.channels() != 1)
+		temp = Preprocess::convertToGray(temp);
 	resize(temp, temp, Size(30, 30));
 	temp.convertTo(temp, CV_32FC1);
 	float r = this->svm->predict(temp.reshape(1, 1));
 	return (char)(int)r;
 }
 
+string DetectChar::tesseractPredict(Mat srcImg)
+{
+	return string();
+}
+
 vector<Mat> DetectChar::splitChar(Mat plate)
 {
 	vector<Mat> character;
 	vector<vector<Point>> contours;
-	Mat thresholdImg = Preprocess::adaptiveThreshold(plate, 19, 9);
+	Mat grayImg = Preprocess::convertToGray(plate);
+	Mat thresholdImg = Preprocess::adaptiveThreshold(grayImg, THRESH_BINARY_INV, 19, 9);
 	findContours(thresholdImg, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 	//Vẽ viền
 	Mat display = plate.clone();
@@ -134,6 +147,7 @@ vector<Mat> DetectChar::splitChar(Mat plate)
 		Rect r = boundingRect(contours[i]);
 		if (checkIfPossibleChar(r, thresholdImg)) {
 			rectangle(display, r, Scalar(0, 0, 255), 1, 8, 0);
+			//cout << r.width << " " << r.height << endl;
 			R.push_back(r);
 		}
 	}
@@ -141,8 +155,6 @@ vector<Mat> DetectChar::splitChar(Mat plate)
 	waitKey(0);
 	display.~Mat();
 	if (R.size() == 0) {
-		cout << "Khong tim thay chu cai." << endl;
-		waitKey(0);
 		return character;
 
 	}
@@ -166,6 +178,82 @@ vector<Mat> DetectChar::splitChar(Mat plate)
 		
 	}
 	return character;
+}
+
+string DetectChar::detectSVMString(vector<Mat> character)
+{
+	string s = "";
+	for (int i = 0; i < character.size(); i++) {
+		s += detectSVM(character[i]);
+	}
+	return s;
+}
+
+string DetectChar::detectKNNString(vector<Mat> character)
+{
+	string s = "";
+	for (int i = 0; i < character.size(); i++) {
+		s += detectKNN(character[i]);
+	}
+	return s;
+}
+
+void DetectChar::trainSVM1(string path)
+{
+	Mat classification;
+	Mat traindata;
+	int i = '0';
+	for (auto &p : fs::directory_iterator(path)) {
+		for (auto &q : fs::directory_iterator(p)) {
+			Mat train;
+			Mat temp = imread(q.path().string(), IMREAD_UNCHANGED);
+			vector<float> r = calculate_feature(temp);
+			train.push_back(r);
+			transpose(train, train);
+			traindata.push_back(train);
+			classification.push_back(i);
+			train.~Mat();
+		}
+		if (i != (int) '9')
+			i++;
+		else
+			i = (int) 'A';
+		if (i == (int)'I')
+			i = (int) 'I';
+	}
+	this->svm1 = SVM::create();
+	this->svm1->setType(SVM::C_SVC);
+	this->svm1->setKernel(SVM::LINEAR);
+	this->svm1->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER, 11, 1e-6));
+	this->svm1->train(traindata, ROW_SAMPLE, classification);
+	//this->knn1 = KNearest::create();
+	//this->knn1->train(traindata, ROW_SAMPLE, classification);
+}
+
+char DetectChar::detectSVM1(Mat srcImg)
+{
+	Mat temp = srcImg.clone();
+	vector<float> r = calculate_feature(temp);
+	Mat predict(0, 0, CV_32FC1);
+	predict.push_back(r);
+	transpose(predict, predict);
+	predict.convertTo(predict, CV_32F);
+	float result = this->svm1->predict(predict);
+	//Mat detect(0, 0, CV_32F);
+	//this->knn1->findNearest(predict, 5, detect);
+	//float result = detect.at<float>(0, 0);
+	//detect.~Mat();
+	predict.~Mat();
+	return (char)(int)result;
+}
+
+string DetectChar::detectSVM1String(vector<Mat> character)
+{
+	string s = "";
+	for (int i = 0; i < character.size(); i++) {
+		s += detectSVM1(character[i]);
+	}
+	return s;
 }
 
 DetectChar::DetectChar()

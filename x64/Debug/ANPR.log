@@ -1,2 +1,37 @@
-﻿  main.cpp
+﻿  DetectPlate1.cpp
+d:\document\c++\anpr\anpr\detectplate1.cpp(65): warning C4244: 'initializing': conversion from '_Tp' to 'int', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
+d:\document\c++\anpr\anpr\detectplate1.cpp(66): warning C4244: 'initializing': conversion from '_Tp' to 'int', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
+d:\document\c++\anpr\anpr\detectplate1.cpp(67): warning C4244: 'initializing': conversion from '_Tp' to 'int', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
+d:\document\c++\anpr\anpr\detectplate1.cpp(68): warning C4244: 'initializing': conversion from '_Tp' to 'int', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
+d:\document\c++\anpr\anpr\detectplate1.cpp(83): warning C4244: 'initializing': conversion from '_Tp' to 'int', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
+d:\document\c++\anpr\anpr\detectplate1.cpp(84): warning C4244: 'initializing': conversion from '_Tp' to 'int', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
+d:\document\c++\anpr\anpr\detectplate1.cpp(91): warning C4244: 'argument': conversion from 'int' to '_Tp', possible loss of data
+          with
+          [
+              _Tp=float
+          ]
   ANPR.vcxproj -> D:\Document\C++\ANPR\ANPR\.\OutputDir\ANPR.exe
